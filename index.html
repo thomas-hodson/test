@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mosaic Momentum Dashboard</title>
+    <style>
+        :root {
+            --bg-deep: #0f172a;
+            --bg-card: rgba(17, 28, 52, 0.92);
+            --bg-panel: rgba(11, 18, 36, 0.9);
+            --border-subtle: rgba(148, 163, 184, 0.25);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5f5;
+            --accent: #6366f1;
+            --accent-soft: rgba(99, 102, 241, 0.15);
+            --success: #22c55e;
+            --danger: #f97316;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+        .page {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.25), transparent 45%), radial-gradient(circle at 80% 0%, rgba(59, 130, 246, 0.2), transparent 55%), var(--bg-deep);
+        }
+        .content {
+            width: min(1280px, 94%);
+            margin: 0 auto;
+            padding: 48px 0 64px;
+        }
+        header.hero {
+            display: flex;
+            gap: 48px;
+            padding: 72px 0 40px;
+            flex-wrap: wrap;
+        }
+        .hero-main {
+            flex: 1 1 420px;
+        }
+        .hero-side {
+            flex: 1 1 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 16px;
+        }
+        h1 {
+            font-size: clamp(36px, 5vw, 54px);
+            margin: 0;
+        }
+        .hero-subhead {
+            color: var(--text-secondary);
+            margin-top: 16px;
+            max-width: 640px;
+            font-size: 18px;
+        }
+        .hero-meta {
+            margin-top: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 24px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        .hero-cta {
+            margin-top: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .primary-cta,
+        .ghost-cta {
+            border-radius: 999px;
+            padding: 12px 20px;
+            font-size: 14px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .primary-cta {
+            background: linear-gradient(120deg, #818cf8, #22d3ee);
+            color: #0f172a;
+        }
+        .ghost-cta {
+            background: transparent;
+            border-color: var(--border-subtle);
+            color: var(--text-primary);
+        }
+        .pill-grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+        .pill-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .pill-label {
+            font-size: 12px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+        .pill-value {
+            font-size: 30px;
+            font-weight: 600;
+        }
+        .pill-caption {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .pill-delta {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .methodology-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 20px;
+        }
+        .methodology-card p {
+            margin: 8px 0 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .stats-grid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            margin-bottom: 48px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .stat-label {
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .stat-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        .metric-delta {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .delta-positive {
+            color: var(--success);
+        }
+        .delta-negative {
+            color: var(--danger);
+        }
+        .delta-neutral {
+            color: #94a3b8;
+        }
+        .chart-analytics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+        .chart-panel {
+            flex: 2 1 560px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border-subtle);
+            border-radius: 24px;
+            padding: 28px;
+            backdrop-filter: blur(6px);
+        }
+        .insight-rail {
+            flex: 1 1 260px;
+            background: rgba(12, 20, 40, 0.8);
+            border: 1px solid var(--border-subtle);
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .insight-card {
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-left: 3px solid var(--accent);
+            border-radius: 14px;
+            padding: 12px 16px 14px;
+            background: rgba(99, 102, 241, 0.06);
+        }
+        .insight-eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            font-size: 11px;
+            color: #a5b4fc;
+            margin: 0 0 6px;
+        }
+        .insight-card h4 {
+            margin: 0;
+            font-size: 17px;
+        }
+        .insight-card p {
+            margin: 6px 0 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        .section-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .section-header p {
+            margin: 0;
+            color: var(--text-secondary);
+            max-width: 480px;
+        }
+        .chart-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .search-group {
+            flex: 2 1 260px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .search-group label {
+            font-size: 12px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+        .search-group input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        .range-toggle {
+            flex: 1 1 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .range-buttons {
+            display: inline-flex;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 999px;
+            padding: 4px;
+            gap: 6px;
+        }
+        .range-button {
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+        .range-button.is-active {
+            background: var(--accent);
+            color: #0f172a;
+        }
+        .chip-panel {
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 16px;
+            padding: 16px;
+            background: rgba(8, 15, 30, 0.6);
+            margin-bottom: 18px;
+        }
+        .selection-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .market-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .market-chip {
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            padding: 6px 14px;
+            font-size: 13px;
+            background: rgba(15, 23, 42, 0.4);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        .market-chip.is-selected {
+            background: rgba(99, 102, 241, 0.25);
+            border-color: rgba(99, 102, 241, 0.8);
+        }
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .control-button {
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: rgba(99, 102, 241, 0.12);
+            color: var(--text-primary);
+            font-size: 12px;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .plot-wrapper {
+            background: #0d162c;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            padding: 12px;
+        }
+        #momentum-canvas {
+            width: 100%;
+            height: 520px;
+        }
+        .leaderboards {
+            margin-bottom: 48px;
+        }
+        .table-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 20px;
+        }
+        .table-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .table-header p {
+            margin: 4px 0 12px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .table-name {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .table-name span {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .table-value {
+            font-weight: 600;
+            text-align: right;
+        }
+        .table-delta {
+            text-align: right;
+        }
+        .trend-notes {
+            margin-bottom: 48px;
+        }
+        .note-grid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+        .note-card {
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 16px;
+            background: rgba(11, 18, 36, 0.75);
+        }
+        .note-badge {
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            font-size: 11px;
+            color: #a5b4fc;
+        }
+        .note-card h4 {
+            margin: 8px 0 6px;
+            font-size: 17px;
+        }
+        .note-card p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .highlights {
+            margin-bottom: 64px;
+        }
+        .highlight-group + .highlight-group {
+            margin-top: 24px;
+        }
+        .highlight-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .highlight-badge {
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .category-positive {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+        }
+        .category-negative {
+            background: rgba(249, 115, 22, 0.15);
+            color: #fb923c;
+        }
+        .category-volatile {
+            background: rgba(248, 250, 252, 0.1);
+            color: #cbd5f5;
+        }
+        .category-neutral {
+            background: rgba(99, 102, 241, 0.2);
+            color: #c4b5fd;
+        }
+        .highlight-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+        .highlight-card {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .highlight-eyebrow {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #94a3b8;
+            margin: 0 0 12px;
+        }
+        .highlight-card h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .highlight-period {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .highlight-narrative {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        footer {
+            margin-top: auto;
+            padding: 24px 0 48px;
+            color: #64748b;
+            font-size: 13px;
+            text-align: center;
+        }
+        @media (max-width: 900px) {
+            .chart-analytics {
+                flex-direction: column;
+            }
+            .insight-rail {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            #momentum-canvas {
+                height: 420px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <main class="content">
+            <header class="hero">
+                <div class="hero-main">
+                    <p class="eyebrow">Mosaic Momentum</p>
+                    <h1>Market Momentum Intelligence</h1>
+                    <p class="hero-subhead">Tracking composite momentum scores across emerging technology markets. Updated October 01, 2025.</p>
+                    <div class="hero-meta">
+                        <span>13 active markets</span>
+                        <span>Quarter cadence · Latest period 2025Q4</span>
+                        <span>Coverage window: Jul 2022 – Oct 2025</span>
+                        <span>1 markets at risk</span>
+                    </div>
+                    <div class="hero-cta">
+                        <button class="primary-cta">Book a data walkthrough</button>
+                        <button class="ghost-cta">Download sample</button>
+                    </div>
+                </div>
+                <div class="hero-side">
+                    <div class="pill-grid">
+<div class="pill-card">
+                        <span class="pill-label">Avg Momentum</span>
+                        <span class="pill-value">717.20</span>
+                        <p class="pill-caption">2025Q4</p>
+                        <span class="pill-delta delta-negative">-3.72</span>
+                    </div>
+<div class="pill-card">
+                        <span class="pill-label">Markets Improving</span>
+                        <span class="pill-value">3/13</span>
+                        <p class="pill-caption">QoQ gainers</p>
+                        <span class="pill-delta delta-positive">23%</span>
+                    </div>
+<div class="pill-card">
+                        <span class="pill-label">Markets Cooling</span>
+                        <span class="pill-value">10/13</span>
+                        <p class="pill-caption">QoQ declines</p>
+                        <span class="pill-delta delta-negative">77%</span>
+                    </div>
+                    </div>
+                    <div class="methodology-card">
+                        <strong>Momentum methodology</strong>
+                        <p>Scores synthesize Mosaic signals on adoption, capital flows, mindshare, and company health to benchmark market velocity.</p>
+                    </div>
+                </div>
+            </header>
+            <section class="stats-grid">
+<div class="stat-card">
+                        <span class="stat-label">Active Markets</span>
+                        <span class="stat-value">13</span>
+                        <p class="stat-description">Quarter cadence coverage</p>
+                        <span class="metric-delta delta-positive">100% above zero</span>
+                    </div>
+<div class="stat-card">
+                        <span class="stat-label">Momentum Leader</span>
+                        <span class="stat-value">Generative engine optimization (GEO) monitoring platforms · 825.61</span>
+                        <p class="stat-description">Strongest latest score among tracked markets</p>
+                        <span class="metric-delta delta-positive">+19.43</span>
+                    </div>
+<div class="stat-card">
+                        <span class="stat-label">Fastest Acceleration</span>
+                        <span class="stat-value">AI agent payments infrastructure</span>
+                        <p class="stat-description">Momentum delta vs prior trend</p>
+                        <span class="metric-delta delta-positive">+34.77</span>
+                    </div>
+<div class="stat-card">
+                        <span class="stat-label">Volatility Watch</span>
+                        <span class="stat-value">Multi-agent systems & orchestration</span>
+                        <p class="stat-description">σ 68.87</p>
+                        <span class="metric-delta delta-negative">Range 240.91 pts</span>
+                    </div>
+            </section>
+            <section class="chart-analytics">
+                <div class="chart-panel">
+                    <div class="section-header">
+                        <div>
+                            <h2>Momentum trajectories</h2>
+                            <p>Toggle markets, focus windows, and compare highlight cohorts to surface surging or cooling opportunity areas.</p>
+                        </div>
+                    </div>
+                    <div class="chart-controls">
+                        <div class="search-group">
+                            <label for="market-search">Search markets</label>
+                            <input id="market-search" type="search" placeholder="Search markets…" spellcheck="false" autocomplete="off">
+                        </div>
+                        <div class="range-toggle">
+                            <label>Range focus</label>
+                            <div class="range-buttons">
+                                <button class="range-button" data-range="1y">1Y</button>
+                                <button class="range-button" data-range="2y">2Y</button>
+                                <button class="range-button is-active" data-range="max">Max</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chip-panel">
+                        <div class="selection-meta">
+                            <span><strong id="selection-count">0</strong> markets selected</span>
+                            <div class="control-buttons">
+                                <button class="control-button" data-action="highlights">Highlights</button>
+                                <button class="control-button" data-action="all">Select All</button>
+                                <button class="control-button" data-action="clear">Clear</button>
+                            </div>
+                        </div>
+                        <div class="market-chips" id="market-chips"></div>
+                    </div>
+                    <div class="plot-wrapper">
+                        <canvas id="momentum-canvas"></canvas>
+                    </div>
+                </div>
+                <aside class="insight-rail">
+                    <h3>Live insights</h3>
+<article class="insight-card">
+                        <p class="insight-eyebrow">Composite</p>
+                        <h4>Average momentum</h4>
+                        <p>717.20 (-3.72) across the coverage window.</p>
+                    </article>
+<article class="insight-card">
+                        <p class="insight-eyebrow">Acceleration</p>
+                        <h4>AI agent payments infrastructure is speeding up</h4>
+                        <p>Shifted +34.77 vs prior momentum change.</p>
+                    </article>
+<article class="insight-card">
+                        <p class="insight-eyebrow">Decline streak</p>
+                        <h4>Markets at risk</h4>
+                        <p>1 consecutive decliners incl. AI shopping agents.</p>
+                    </article>
+<article class="insight-card">
+                        <p class="insight-eyebrow">Dislocation</p>
+                        <h4>AI agent observability, evaluation, & governance slided 130.85 pts</h4>
+                        <p>Largest single-period move captured in 2023Q4.</p>
+                    </article>
+                </aside>
+            </section>
+            <section class="leaderboards">
+                <div class="section-header">
+                    <h2>Momentum leaderboards</h2>
+                    <p>Automatic tiers to spotlight surging, cooling, and volatile markets.</p>
+                </div>
+                <div class="table-grid">
+<article class="table-card">
+                        <div class="table-header">
+                            <h3>Emerging Leaders</h3>
+                            <p>Biggest quarter-over-quarter gains</p>
+                        </div>
+                        <table>
+                            <tbody>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>Data streaming platforms</strong>
+                                        <span>2025Q4 · 2x rise</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">789.48</td>
+                                <td class="table-delta"><span class="metric-delta delta-positive">+64.00</span></td>
+                            </tr>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>AI agent payments infrastructure</strong>
+                                        <span>2025Q4 · 2x rise</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">731.27</td>
+                                <td class="table-delta"><span class="metric-delta delta-positive">+38.73</span></td>
+                            </tr>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>Generative engine optimization (GEO) monitoring platforms</strong>
+                                        <span>2025Q4 · 4x rise</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">825.61</td>
+                                <td class="table-delta"><span class="metric-delta delta-positive">+19.43</span></td>
+                            </tr>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>Generative engine optimization (GEO) content platforms</strong>
+                                        <span>2025Q4</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">672.83</td>
+                                <td class="table-delta"><span class="metric-delta delta-negative">-0.92</span></td>
+                            </tr>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>AI agent authentication platforms</strong>
+                                        <span>2025Q4</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">765.71</td>
+                                <td class="table-delta"><span class="metric-delta delta-negative">-6.58</span></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </article>
+<article class="table-card">
+                        <div class="table-header">
+                            <h3>Cooling Markets</h3>
+                            <p>Largest quarter-over-quarter drops</p>
+                        </div>
+                        <table>
+                            <tbody>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>AI shopping agents</strong>
+                                        <span>2025Q4 · 3x slide</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">598.20</td>
+                                <td class="table-delta"><span class="metric-delta delta-negative">-53.71</span></td>
+                            </tr>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>AI agent memory management</strong>
+                                        <span>2025Q4</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">714.19</td>
+                                <td class="table-delta"><span class="metric-delta delta-negative">-26.77</span></td>
+                            </tr>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>MCP servers for retail</strong>
+                                        <span>2025Q4 · 2x slide</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">673.55</td>
+                                <td class="table-delta"><span class="metric-delta delta-negative">-21.23</span></td>
+                            </tr>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>AI agent observability, evaluation, & governance</strong>
+                                        <span>2025Q4</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">643.12</td>
+                                <td class="table-delta"><span class="metric-delta delta-negative">-18.07</span></td>
+                            </tr>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>Multi-agent systems & orchestration</strong>
+                                        <span>2025Q4</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">773.82</td>
+                                <td class="table-delta"><span class="metric-delta delta-negative">-13.31</span></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </article>
+<article class="table-card">
+                        <div class="table-header">
+                            <h3>Volatility Watch</h3>
+                            <p>Widest momentum ranges</p>
+                        </div>
+                        <table>
+                            <tbody>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>Multi-agent systems & orchestration</strong>
+                                        <span>2025Q4</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">σ 68.87</td>
+                                <td class="table-delta"><span class="metric-delta delta-negative">Range 240.91</span></td>
+                            </tr>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>Generative engine optimization (GEO) monitoring platforms</strong>
+                                        <span>2025Q4 · 4x rise</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">σ 53.78</td>
+                                <td class="table-delta"><span class="metric-delta delta-negative">Range 212.87</span></td>
+                            </tr>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>AI shopping agents</strong>
+                                        <span>2025Q4 · 3x slide</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">σ 66.30</td>
+                                <td class="table-delta"><span class="metric-delta delta-negative">Range 211.46</span></td>
+                            </tr>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>MCP servers for retail</strong>
+                                        <span>2025Q4 · 2x slide</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">σ 66.41</td>
+                                <td class="table-delta"><span class="metric-delta delta-negative">Range 201.50</span></td>
+                            </tr>
+<tr>
+                                <td>
+                                    <div class="table-name">
+                                        <strong>Data streaming platforms</strong>
+                                        <span>2025Q4 · 2x rise</span>
+                                    </div>
+                                </td>
+                                <td class="table-value">σ 48.08</td>
+                                <td class="table-delta"><span class="metric-delta delta-negative">Range 187.01</span></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </article>
+                </div>
+            </section>
+            <section class="trend-notes">
+                <div class="section-header">
+                    <h2>Trend notes</h2>
+                    <p>Auto-detected inflections, reversals, and extremes worth briefing clients on.</p>
+                </div>
+                <div class="note-grid">
+<article class="note-card">
+                        <span class="note-badge">New high</span>
+                        <h4>Data streaming platforms set a cycle high</h4>
+                        <p>2025Q4 score 789.48, eclipsing prior peaks.</p>
+                    </article>
+<article class="note-card">
+                        <span class="note-badge">New high</span>
+                        <h4>Generative engine optimization (GEO) monitoring platforms set a cycle high</h4>
+                        <p>2025Q4 score 825.61, eclipsing prior peaks.</p>
+                    </article>
+<article class="note-card">
+                        <span class="note-badge">New low</span>
+                        <h4>Product information management (PIM) hit a new low</h4>
+                        <p>Drawdown now 58.58 points from peak levels.</p>
+                    </article>
+<article class="note-card">
+                        <span class="note-badge">New low</span>
+                        <h4>MCP servers for retail hit a new low</h4>
+                        <p>Drawdown now 201.50 points from peak levels.</p>
+                    </article>
+<article class="note-card">
+                        <span class="note-badge">New low</span>
+                        <h4>AI shopping agents hit a new low</h4>
+                        <p>Drawdown now 211.46 points from peak levels.</p>
+                    </article>
+<article class="note-card">
+                        <span class="note-badge">Reversal</span>
+                        <h4>Multi-agent systems & orchestration rolled over</h4>
+                        <p>Momentum slipped 13.31 after a prior gain, watch for further cooling.</p>
+                    </article>
+                </div>
+            </section>
+            <section class="highlights">
+                <h2>Market highlights</h2>
+<div class="highlight-group">
+                        <div class="highlight-group-header">
+                            <span class="highlight-badge category-positive">Emerging Leaders</span>
+                        </div>
+                        <div class="highlight-grid">
+<article class="highlight-card">
+                                <header>
+                                    <p class="highlight-eyebrow">strongest 12-month momentum gain</p>
+                                    <h3>Generative engine optimization (GEO) monitoring platforms</h3>
+                                    <p class="highlight-period">2025Q4</p>
+                                </header>
+                                <p class="highlight-narrative">4-period climb. Momentum cooling by 90.31.</p>
+                                <div class="highlight-metrics">
+                                    <div>
+                                        <span class="metric-label">Latest score</span>
+                                        <span class="metric-value">825.61</span>
+                                    </div>
+                                    <div>
+                                        <span class="metric-label">vs prior</span>
+                                        <span class="metric-delta delta-positive">+19.43</span>
+                                    </div>
+                                    <div>
+                                        <span class="metric-label">vs 12 mo</span>
+                                        <span class="metric-delta delta-positive">+212.87</span>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+<div class="highlight-group">
+                        <div class="highlight-group-header">
+                            <span class="highlight-badge category-negative">Cooling Markets</span>
+                        </div>
+                        <div class="highlight-grid">
+<article class="highlight-card">
+                                <header>
+                                    <p class="highlight-eyebrow">largest 12-month momentum decline</p>
+                                    <h3>AI agent memory management</h3>
+                                    <p class="highlight-period">2025Q4</p>
+                                </header>
+                                <p class="highlight-narrative">Momentum cooling by 44.38.</p>
+                                <div class="highlight-metrics">
+                                    <div>
+                                        <span class="metric-label">Latest score</span>
+                                        <span class="metric-value">714.19</span>
+                                    </div>
+                                    <div>
+                                        <span class="metric-label">vs prior</span>
+                                        <span class="metric-delta delta-negative">-26.77</span>
+                                    </div>
+                                    <div>
+                                        <span class="metric-label">vs 12 mo</span>
+                                        <span class="metric-delta delta-negative">-88.45</span>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+<div class="highlight-group">
+                        <div class="highlight-group-header">
+                            <span class="highlight-badge category-volatile">Volatility Watch</span>
+                        </div>
+                        <div class="highlight-grid">
+<article class="highlight-card">
+                                <header>
+                                    <p class="highlight-eyebrow">largest momentum swings (high variability)</p>
+                                    <h3>Multi-agent systems & orchestration</h3>
+                                    <p class="highlight-period">2025Q4</p>
+                                </header>
+                                <p class="highlight-narrative">Momentum cooling by 52.65.</p>
+                                <div class="highlight-metrics">
+                                    <div>
+                                        <span class="metric-label">Latest score</span>
+                                        <span class="metric-value">773.82</span>
+                                    </div>
+                                    <div>
+                                        <span class="metric-label">vs prior</span>
+                                        <span class="metric-delta delta-negative">-13.31</span>
+                                    </div>
+                                    <div>
+                                        <span class="metric-label">vs 12 mo</span>
+                                        <span class="metric-delta delta-positive">+46.42</span>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+            </section>
+        </main>
+        <footer>
+            Powered by Mosaic momentum scoring · Generated dashboard landing page
+        </footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script>
+const chartData = {"frequency": "quarterly", "frequency_label": "Quarter", "markets": [{"name": "Multi-agent systems & orchestration", "color": "#1f77b4", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 643.0777777777778}, {"date": "2022-10-01", "label": "2022Q4", "score": 605.775956284153}, {"date": "2023-01-01", "label": "2023Q1", "score": 546.2272727272727}, {"date": "2023-04-01", "label": "2023Q2", "score": 581.5648535564853}, {"date": "2023-07-01", "label": "2023Q3", "score": 705.047619047619}, {"date": "2023-10-01", "label": "2023Q4", "score": 717.66875}, {"date": "2024-01-01", "label": "2024Q1", "score": 678.1424418604652}, {"date": "2024-04-01", "label": "2024Q2", "score": 671.0254629629629}, {"date": "2024-07-01", "label": "2024Q3", "score": 698.6255319148936}, {"date": "2024-10-01", "label": "2024Q4", "score": 727.3995771670191}, {"date": "2025-01-01", "label": "2025Q1", "score": 735.0618374558304}, {"date": "2025-04-01", "label": "2025Q2", "score": 747.7894736842105}, {"date": "2025-07-01", "label": "2025Q3", "score": 787.1338688085676}, {"date": "2025-10-01", "label": "2025Q4", "score": 773.8243727598566}], "latest_score": 773.8243727598566, "latest_period": "2025Q4", "highlight_reason": "largest momentum swings (high variability)"}, {"name": "AI agent observability, evaluation, & governance", "color": "#ff7f0e", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 666.4148148148148}, {"date": "2022-10-01", "label": "2022Q4", "score": 631.8559322033898}, {"date": "2023-01-01", "label": "2023Q1", "score": 616.1816326530612}, {"date": "2023-04-01", "label": "2023Q2", "score": 592.3976833976834}, {"date": "2023-07-01", "label": "2023Q3", "score": 712.7042253521126}, {"date": "2023-10-01", "label": "2023Q4", "score": 581.8569105691057}, {"date": "2024-01-01", "label": "2024Q1", "score": 538.5700483091788}, {"date": "2024-04-01", "label": "2024Q2", "score": 563.9341199606687}, {"date": "2024-07-01", "label": "2024Q3", "score": 581.1801541425818}, {"date": "2024-10-01", "label": "2024Q4", "score": 561.2371428571429}, {"date": "2025-01-01", "label": "2025Q1", "score": 612.5535224153706}, {"date": "2025-04-01", "label": "2025Q2", "score": 636.682769726248}, {"date": "2025-07-01", "label": "2025Q3", "score": 661.1844207723036}, {"date": "2025-10-01", "label": "2025Q4", "score": 643.1182795698925}], "latest_score": 643.1182795698925, "latest_period": "2025Q4", "highlight_reason": null}, {"name": "Vector databases", "color": "#2ca02c", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 723.6666666666666}, {"date": "2022-10-01", "label": "2022Q4", "score": 698.3586956521739}, {"date": "2023-01-01", "label": "2023Q1", "score": 712.6223776223776}, {"date": "2023-04-01", "label": "2023Q2", "score": 741.3307692307692}, {"date": "2023-07-01", "label": "2023Q3", "score": 711.6282828282829}, {"date": "2023-10-01", "label": "2023Q4", "score": 691.1831501831501}, {"date": "2024-01-01", "label": "2024Q1", "score": 697.6212624584717}, {"date": "2024-04-01", "label": "2024Q2", "score": 718.9948364888124}, {"date": "2024-07-01", "label": "2024Q3", "score": 721.2535211267606}, {"date": "2024-10-01", "label": "2024Q4", "score": 692.5815217391304}, {"date": "2025-01-01", "label": "2025Q1", "score": 727.1958333333333}, {"date": "2025-04-01", "label": "2025Q2", "score": 754.0593103448276}, {"date": "2025-07-01", "label": "2025Q3", "score": 744.3467202141901}, {"date": "2025-10-01", "label": "2025Q4", "score": 735.8442028985507}], "latest_score": 735.8442028985507, "latest_period": "2025Q4", "highlight_reason": null}, {"name": "AI agent memory management", "color": "#d62728", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 759.7111111111111}, {"date": "2022-10-01", "label": "2022Q4", "score": 739.3414634146342}, {"date": "2023-01-01", "label": "2023Q1", "score": 740.7209302325581}, {"date": "2023-04-01", "label": "2023Q2", "score": 770.9530201342282}, {"date": "2023-07-01", "label": "2023Q3", "score": 880.6983240223464}, {"date": "2023-10-01", "label": "2023Q4", "score": 867.369918699187}, {"date": "2024-01-01", "label": "2024Q1", "score": 738.9472140762464}, {"date": "2024-04-01", "label": "2024Q2", "score": 788.8543956043956}, {"date": "2024-07-01", "label": "2024Q3", "score": 856.7013698630137}, {"date": "2024-10-01", "label": "2024Q4", "score": 802.6454081632653}, {"date": "2025-01-01", "label": "2025Q1", "score": 710.0827922077922}, {"date": "2025-04-01", "label": "2025Q2", "score": 723.356846473029}, {"date": "2025-07-01", "label": "2025Q3", "score": 740.9627659574468}, {"date": "2025-10-01", "label": "2025Q4", "score": 714.1935483870968}], "latest_score": 714.1935483870968, "latest_period": "2025Q4", "highlight_reason": "largest 12-month momentum decline"}, {"name": "Data streaming platforms", "color": "#9467bd", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 694.4666666666667}, {"date": "2022-10-01", "label": "2022Q4", "score": 701.2017391304348}, {"date": "2023-01-01", "label": "2023Q1", "score": 729.0353982300885}, {"date": "2023-04-01", "label": "2023Q2", "score": 615.2016574585635}, {"date": "2023-07-01", "label": "2023Q3", "score": 644.3027139874739}, {"date": "2023-10-01", "label": "2023Q4", "score": 642.5961538461538}, {"date": "2024-01-01", "label": "2024Q1", "score": 602.46847960445}, {"date": "2024-04-01", "label": "2024Q2", "score": 649.7446504992868}, {"date": "2024-07-01", "label": "2024Q3", "score": 668.9686985172982}, {"date": "2024-10-01", "label": "2024Q4", "score": 651.8}, {"date": "2025-01-01", "label": "2025Q1", "score": 657.9330708661417}, {"date": "2025-04-01", "label": "2025Q2", "score": 654.2244897959183}, {"date": "2025-07-01", "label": "2025Q3", "score": 725.4839357429719}, {"date": "2025-10-01", "label": "2025Q4", "score": 789.4806629834254}], "latest_score": 789.4806629834254, "latest_period": "2025Q4", "highlight_reason": null}, {"name": "AI agent authentication platforms", "color": "#8c564b", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 814.1288888888889}, {"date": "2022-10-01", "label": "2022Q4", "score": 807.4801864801865}, {"date": "2023-01-01", "label": "2023Q1", "score": 824.7579185520362}, {"date": "2023-04-01", "label": "2023Q2", "score": 777.7094017094017}, {"date": "2023-07-01", "label": "2023Q3", "score": 791.281746031746}, {"date": "2023-10-01", "label": "2023Q4", "score": 768.140243902439}, {"date": "2024-01-01", "label": "2024Q1", "score": 763.2596899224807}, {"date": "2024-04-01", "label": "2024Q2", "score": 761.2985347985348}, {"date": "2024-07-01", "label": "2024Q3", "score": 753.481884057971}, {"date": "2024-10-01", "label": "2024Q4", "score": 791.7140439932318}, {"date": "2025-01-01", "label": "2025Q1", "score": 763.0031746031746}, {"date": "2025-04-01", "label": "2025Q2", "score": 768.8870151770658}, {"date": "2025-07-01", "label": "2025Q3", "score": 772.2854291417166}, {"date": "2025-10-01", "label": "2025Q4", "score": 765.7055837563452}], "latest_score": 765.7055837563452, "latest_period": "2025Q4", "highlight_reason": null}, {"name": "Generative engine optimization (GEO) monitoring platforms", "color": "#e377c2", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 767.1111111111111}, {"date": "2022-10-01", "label": "2022Q4", "score": 726.5853658536586}, {"date": "2023-01-01", "label": "2023Q1", "score": 755.1279069767442}, {"date": "2023-04-01", "label": "2023Q2", "score": 737.8247422680413}, {"date": "2023-07-01", "label": "2023Q3", "score": 747.1666666666666}, {"date": "2023-10-01", "label": "2023Q4", "score": 757.2317073170732}, {"date": "2024-01-01", "label": "2024Q1", "score": 773.4328358208955}, {"date": "2024-04-01", "label": "2024Q2", "score": 716.295358649789}, {"date": "2024-07-01", "label": "2024Q3", "score": 685.5095785440614}, {"date": "2024-10-01", "label": "2024Q4", "score": 612.7421203438396}, {"date": "2025-01-01", "label": "2025Q1", "score": 668.98}, {"date": "2025-04-01", "label": "2025Q2", "score": 696.4411764705883}, {"date": "2025-07-01", "label": "2025Q3", "score": 806.1814671814672}, {"date": "2025-10-01", "label": "2025Q4", "score": 825.6129032258065}], "latest_score": 825.6129032258065, "latest_period": "2025Q4", "highlight_reason": "strongest 12-month momentum gain"}, {"name": "Generative engine optimization (GEO) content platforms", "color": "#7f7f7f", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 767.1111111111111}, {"date": "2022-10-01", "label": "2022Q4", "score": 704.0820895522388}, {"date": "2023-01-01", "label": "2023Q1", "score": 705.0469483568075}, {"date": "2023-04-01", "label": "2023Q2", "score": 653.4487179487179}, {"date": "2023-07-01", "label": "2023Q3", "score": 716.2063492063492}, {"date": "2023-10-01", "label": "2023Q4", "score": 771.8372093023256}, {"date": "2024-01-01", "label": "2024Q1", "score": 653.726688102894}, {"date": "2024-04-01", "label": "2024Q2", "score": 639.8115942028985}, {"date": "2024-07-01", "label": "2024Q3", "score": 685.7280966767372}, {"date": "2024-10-01", "label": "2024Q4", "score": 586.2547169811321}, {"date": "2025-01-01", "label": "2025Q1", "score": 586.4560260586319}, {"date": "2025-04-01", "label": "2025Q2", "score": 624.8088235294117}, {"date": "2025-07-01", "label": "2025Q3", "score": 673.7511591962906}, {"date": "2025-10-01", "label": "2025Q4", "score": 672.8266129032259}], "latest_score": 672.8266129032259, "latest_period": "2025Q4", "highlight_reason": null}, {"name": "Product information management (PIM)", "color": "#bcbd22", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 743.2172839506172}, {"date": "2022-10-01", "label": "2022Q4", "score": 730.4012195121951}, {"date": "2023-01-01", "label": "2023Q1", "score": 709.1083953241233}, {"date": "2023-04-01", "label": "2023Q2", "score": 718.6922141119221}, {"date": "2023-07-01", "label": "2023Q3", "score": 736.2156593406594}, {"date": "2023-10-01", "label": "2023Q4", "score": 734.5230352303523}, {"date": "2024-01-01", "label": "2024Q1", "score": 745.9698952879581}, {"date": "2024-04-01", "label": "2024Q2", "score": 728.643956043956}, {"date": "2024-07-01", "label": "2024Q3", "score": 713.645342312009}, {"date": "2024-10-01", "label": "2024Q4", "score": 716.8745562130177}, {"date": "2025-01-01", "label": "2025Q1", "score": 710.7666666666667}, {"date": "2025-04-01", "label": "2025Q2", "score": 689.6933333333334}, {"date": "2025-07-01", "label": "2025Q3", "score": 697.691371681416}, {"date": "2025-10-01", "label": "2025Q4", "score": 687.3924731182796}], "latest_score": 687.3924731182796, "latest_period": "2025Q4", "highlight_reason": null}, {"name": "MCP servers for retail", "color": "#17becf", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 875.0444444444445}, {"date": "2022-10-01", "label": "2022Q4", "score": 858.829268292683}, {"date": "2023-01-01", "label": "2023Q1", "score": 841.1860465116279}, {"date": "2023-04-01", "label": "2023Q2", "score": 808.1875}, {"date": "2023-07-01", "label": "2023Q3", "score": 757.25}, {"date": "2023-10-01", "label": "2023Q4", "score": 766.9699248120301}, {"date": "2024-01-01", "label": "2024Q1", "score": 848.0232558139535}, {"date": "2024-04-01", "label": "2024Q2", "score": 867.6263736263736}, {"date": "2024-07-01", "label": "2024Q3", "score": 771.5741935483871}, {"date": "2024-10-01", "label": "2024Q4", "score": 744.7142857142857}, {"date": "2025-01-01", "label": "2025Q1", "score": 701.7}, {"date": "2025-04-01", "label": "2025Q2", "score": 725.8313725490196}, {"date": "2025-07-01", "label": "2025Q3", "score": 694.7791164658635}, {"date": "2025-10-01", "label": "2025Q4", "score": 673.5483870967741}], "latest_score": 673.5483870967741, "latest_period": "2025Q4", "highlight_reason": null}, {"name": "AI shopping agents", "color": "#1f77b4", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 792.6}, {"date": "2022-10-01", "label": "2022Q4", "score": 734.5445544554456}, {"date": "2023-01-01", "label": "2023Q1", "score": 807.5953757225434}, {"date": "2023-04-01", "label": "2023Q2", "score": 809.6602564102565}, {"date": "2023-07-01", "label": "2023Q3", "score": 723.0334728033473}, {"date": "2023-10-01", "label": "2023Q4", "score": 674.5153846153846}, {"date": "2024-01-01", "label": "2024Q1", "score": 620.5258855585831}, {"date": "2024-04-01", "label": "2024Q2", "score": 643.792531120332}, {"date": "2024-07-01", "label": "2024Q3", "score": 653.9958158995815}, {"date": "2024-10-01", "label": "2024Q4", "score": 663.4257246376811}, {"date": "2025-01-01", "label": "2025Q1", "score": 677.0689075630252}, {"date": "2025-04-01", "label": "2025Q2", "score": 662.6373626373627}, {"date": "2025-07-01", "label": "2025Q3", "score": 651.9130434782609}, {"date": "2025-10-01", "label": "2025Q4", "score": 598.2}], "latest_score": 598.2, "latest_period": "2025Q4", "highlight_reason": null}, {"name": "AI agent payments infrastructure", "color": "#ff7f0e", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 769.6861313868613}, {"date": "2022-10-01", "label": "2022Q4", "score": 716.7865853658536}, {"date": "2023-01-01", "label": "2023Q1", "score": 694.6831395348837}, {"date": "2023-04-01", "label": "2023Q2", "score": 671.7491525423728}, {"date": "2023-07-01", "label": "2023Q3", "score": 672.1957831325301}, {"date": "2023-10-01", "label": "2023Q4", "score": 664.8506097560976}, {"date": "2024-01-01", "label": "2024Q1", "score": 737.0697674418604}, {"date": "2024-04-01", "label": "2024Q2", "score": 729.6410256410256}, {"date": "2024-07-01", "label": "2024Q3", "score": 767.2588235294118}, {"date": "2024-10-01", "label": "2024Q4", "score": 679.6108695652174}, {"date": "2025-01-01", "label": "2025Q1", "score": 703.952380952381}, {"date": "2025-04-01", "label": "2025Q2", "score": 688.5764023210832}, {"date": "2025-07-01", "label": "2025Q3", "score": 692.5414141414142}, {"date": "2025-10-01", "label": "2025Q4", "score": 731.2741935483871}], "latest_score": 731.2741935483871, "latest_period": "2025Q4", "highlight_reason": null}, {"name": "Customer service AI agents & copilots", "color": "#2ca02c", "series": [{"date": "2022-07-01", "label": "2022Q3", "score": 742.0833333333334}, {"date": "2022-10-01", "label": "2022Q4", "score": 734.2852441031267}, {"date": "2023-01-01", "label": "2023Q1", "score": 731.4270613107823}, {"date": "2023-04-01", "label": "2023Q2", "score": 705.6337562051848}, {"date": "2023-07-01", "label": "2023Q3", "score": 729.1283716283716}, {"date": "2023-10-01", "label": "2023Q4", "score": 706.9507317073171}, {"date": "2024-01-01", "label": "2024Q1", "score": 690.6920955882352}, {"date": "2024-04-01", "label": "2024Q2", "score": 682.4521841794569}, {"date": "2024-07-01", "label": "2024Q3", "score": 670.9101479915433}, {"date": "2024-10-01", "label": "2024Q4", "score": 702.1062954761152}, {"date": "2025-01-01", "label": "2025Q1", "score": 719.8970394736842}, {"date": "2025-04-01", "label": "2025Q2", "score": 731.5268015619454}, {"date": "2025-07-01", "label": "2025Q3", "score": 723.6893063583815}, {"date": "2025-10-01", "label": "2025Q4", "score": 712.6077199281867}], "latest_score": 712.6077199281867, "latest_period": "2025Q4", "highlight_reason": null}]};
+const defaultSelectionNames = ["Generative engine optimization (GEO) monitoring platforms", "AI agent memory management", "Multi-agent systems & orchestration"];
+const markets = chartData.markets.map(entry => ({
+    ...entry,
+    search: entry.name.toLowerCase()
+}));
+const marketsByName = new Map(markets.map(entry => [entry.name, entry]));
+const highlightDefaults = defaultSelectionNames.length ? new Set(defaultSelectionNames) : new Set();
+
+const state = {
+    selected: new Set(defaultSelectionNames),
+    range: "max",
+};
+
+if (state.selected.size === 0 && markets.length) {
+    state.selected.add(markets[0].name);
+}
+
+const countEl = document.getElementById("selection-count");
+const chipsContainer = document.getElementById("market-chips");
+const searchInput = document.getElementById("market-search");
+const rangeButtons = document.querySelectorAll("[data-range]");
+
+function filterSeries(series) {
+    if (state.range === "max") {
+        return series;
+    }
+    const cadence = chartData.frequency === "quarterly" ? 4 : 12;
+    const lengths = {
+        "1y": cadence,
+        "2y": cadence * 2,
+    };
+    const limit = lengths[state.range] || series.length;
+    return series.slice(Math.max(series.length - limit, 0));
+}
+
+function buildDatasets() {
+    const datasets = [];
+    const paletteFallback = ["#7dd3fc", "#c4b5fd", "#f9a8d4", "#facc15", "#34d399", "#f97316"];
+    let fallbackIndex = 0;
+    state.selected.forEach(name => {
+        const market = marketsByName.get(name);
+        if (!market) return;
+        const color = market.color || paletteFallback[fallbackIndex % paletteFallback.length];
+        fallbackIndex += 1;
+        const series = filterSeries(market.series);
+        datasets.push({
+            label: market.name,
+            data: series.map(point => ({ x: point.date, y: point.score })),
+            borderColor: color,
+            backgroundColor: color,
+            tension: 0.32,
+            borderWidth: 2.4,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            fill: false,
+        });
+    });
+    return datasets;
+}
+
+const ctx = document.getElementById("momentum-canvas");
+const chart = new Chart(ctx, {
+    type: "line",
+    data: {
+        datasets: buildDatasets(),
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            mode: "nearest",
+            intersect: false,
+        },
+        plugins: {
+            legend: {
+                display: false,
+            },
+            tooltip: {
+                callbacks: {
+                    title(items) {
+                        if (!items.length) return "";
+                        const point = items[0].raw;
+                        const market = marketsByName.get(items[0].dataset.label);
+                        if (!market) return point.x;
+                        const match = market.series.find(entry => entry.date === point.x);
+                        return match ? match.label : point.x;
+                    },
+                    label(item) {
+                        const value = item.parsed.y;
+                        return item.dataset.label + ": " + value.toFixed(2);
+                    },
+                },
+            },
+        },
+        scales: {
+            x: {
+                type: "time",
+                time: {
+                    tooltipFormat: "MMM yyyy",
+                },
+                ticks: {
+                    color: "rgba(203, 213, 225, 0.9)",
+                },
+                grid: {
+                    color: "rgba(148, 163, 184, 0.15)",
+                },
+            },
+            y: {
+                ticks: {
+                    color: "rgba(203, 213, 225, 0.9)",
+                },
+                grid: {
+                    color: "rgba(148, 163, 184, 0.14)",
+                },
+            },
+        },
+    },
+});
+
+function updateSelectionCount() {
+    countEl.textContent = state.selected.size;
+}
+
+function renderChips(filterValue) {
+    const query = (filterValue || "").trim().toLowerCase();
+    const filtered = query ? markets.filter(entry => entry.search.includes(query)) : markets;
+    const fragment = document.createDocumentFragment();
+    filtered.forEach(entry => {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "market-chip" + (state.selected.has(entry.name) ? " is-selected" : "");
+        chip.textContent = entry.name;
+        chip.addEventListener("click", () => {
+            if (state.selected.has(entry.name)) {
+                state.selected.delete(entry.name);
+            } else {
+                state.selected.add(entry.name);
+            }
+            refresh(false);
+        });
+        fragment.appendChild(chip);
+    });
+    chipsContainer.replaceChildren(fragment);
+}
+
+function refresh(updateChips = true) {
+    if (state.selected.size === 0 && markets.length) {
+        state.selected.add(markets[0].name);
+    }
+    chart.data.datasets = buildDatasets();
+    chart.update();
+    updateSelectionCount();
+    if (updateChips) {
+        renderChips(searchInput.value);
+    }
+}
+
+searchInput.addEventListener("input", () => {
+    renderChips(searchInput.value);
+});
+
+rangeButtons.forEach(button => {
+    button.addEventListener("click", () => {
+        state.range = button.dataset.range;
+        rangeButtons.forEach(btn => btn.classList.toggle("is-active", btn === button));
+        refresh(false);
+    });
+});
+
+document.querySelectorAll(".control-button").forEach(button => {
+    button.addEventListener("click", () => {
+        const action = button.dataset.action;
+        if (action === "highlights") {
+            const source = highlightDefaults.size ? highlightDefaults : new Set(defaultSelectionNames);
+            state.selected = new Set(source);
+        } else if (action === "all") {
+            state.selected = new Set(markets.map(entry => entry.name));
+        } else if (action === "clear") {
+            state.selected.clear();
+        }
+        refresh(true);
+    });
+});
+
+renderChips("");
+refresh(false);
+    </script>
+</body>
+</html>
